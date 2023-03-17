@@ -52,6 +52,16 @@ class User extends Authenticatable implements MustVerifyEmail
         'created' => Registered::class,
     ];
 
+    public function getKeyType(): string
+    {
+        return 'string';
+    }
+
+    public function getIncrementing(): bool
+    {
+        return false;
+    }
+
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user')->withTimestamps();

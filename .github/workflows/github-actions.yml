@@ -48,6 +48,7 @@ jobs:
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
+          CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
         run: php artisan test --parallel
 
       - name: Upload test results
