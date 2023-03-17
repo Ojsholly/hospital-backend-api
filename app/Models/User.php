@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasRoles;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,7 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'phone', 'profile_picture',
+        'first_name', 'last_name', 'email', 'phone', 'profile_picture', 'password',
     ];
 
     /**
@@ -45,6 +46,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $with = [
         'roles',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => Registered::class,
     ];
 
     public function roles(): BelongsToMany
