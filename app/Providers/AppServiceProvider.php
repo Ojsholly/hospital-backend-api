@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         // Define response macros for commonly used HTTP status codes
-        Response::macro('success', function ($data = [], $message = '') {
+        Response::macro('success', function (mixed $data = [], string $message = ''): ResponseAlias {
             return response()->json([
                 'status' => 'success',
                 'message' => $message,
@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
             ], ResponseAlias::HTTP_OK);
         });
 
-        Response::macro('created', function ($data = [], $message = '') {
+        Response::macro('created', function (mixed $data = [], string $message = ''): ResponseAlias {
             return response()->json([
                 'status' => 'success',
                 'message' => $message,
@@ -45,42 +45,35 @@ class AppServiceProvider extends ServiceProvider
             ], ResponseAlias::HTTP_CREATED);
         });
 
-        Response::macro('noContent', function ($message = '') {
-            return response()->json([
-                'status' => 'success',
-                'message' => $message,
-            ], ResponseAlias::HTTP_NO_CONTENT);
-        });
-
-        Response::macro('badRequest', function ($message = '') {
+        Response::macro('badRequest', function (string $message = ''): ResponseAlias {
             return response()->json([
                 'status' => 'error',
                 'message' => $message,
             ], ResponseAlias::HTTP_BAD_REQUEST);
         });
 
-        Response::macro('unauthorized', function ($message = '') {
+        Response::macro('unauthorized', function (string $message = ''): ResponseAlias {
             return response()->json([
                 'status' => 'error',
                 'message' => $message,
             ], ResponseAlias::HTTP_UNAUTHORIZED);
         });
 
-        Response::macro('forbidden', function ($message = '') {
+        Response::macro('forbidden', function (string $message = ''): ResponseAlias {
             return response()->json([
                 'status' => 'error',
                 'message' => $message,
             ], ResponseAlias::HTTP_FORBIDDEN);
         });
 
-        Response::macro('notFound', function ($message = '') {
+        Response::macro('notFound', function (string $message = ''): ResponseAlias {
             return response()->json([
                 'status' => 'error',
                 'message' => $message,
             ], ResponseAlias::HTTP_NOT_FOUND);
         });
 
-        Response::macro('internalServerError', function ($message = '') {
+        Response::macro('internalServerError', function (string $message = ''): ResponseAlias {
             return response()->json([
                 'status' => 'error',
                 'message' => $message,
@@ -88,7 +81,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Define a new macro for the Eloquent builder called 'whereLike'.
-        Builder::macro('whereLike', function ($attributes, string $searchTerm) {
+        Builder::macro('whereLike', function (string|array $attributes, string $searchTerm): Builder {
             $this->where(function (Builder $query) use ($attributes, $searchTerm) {
                 foreach (Arr::wrap($attributes) as $attribute) {
                     $query->when(str_contains($attribute, '.'), function (Builder $query) use ($attribute, $searchTerm) {
