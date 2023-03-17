@@ -7,13 +7,10 @@ use App\Models\Role;
 use App\Models\User;
 use Auth;
 use Database\Seeders\RoleSeeder;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -100,9 +97,6 @@ class AuthenticationTest extends TestCase
         Auth::login($user);
         $user->sendEmailVerificationNotification();
 
-        // Assert that the verification email was sent
-//        Mail::assertSent(VerifyEmail::class);
-
         // Visit the verification URL and assert that the user's email is verified
         $this->get($verificationUrl)
             ->assertOk()
@@ -111,5 +105,57 @@ class AuthenticationTest extends TestCase
             ->assertViewHas('message', 'Email address verified successfully. You can now close this window.');
 
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
+    }
+
+    public function test_login_fields_are_validated_properly()
+    {
+        $this->postJson(route('login'))->assertUnprocessable()->assertJsonValidationErrors([
+            'email', 'password', 'role',
+        ])->assertJsonStructure([
+            'message', 'errors' => [
+                'email', 'password',
+            ],
+        ]);
+    }
+
+    public function test_patient_cannot_login_with_invalid_credentials()
+    {
+        $this->postJson(route('login'), [
+            'email' => $this->faker->email(),
+            'password' => Str::random(16),
+            'role' => RoleEnum::PATIENT,
+        ])->assertUnauthorized()->assertJsonStructure([
+            'message', 'status',
+        ]);
+    }
+
+    public function test_patient_cannot_login_with_unverified_email_address()
+    {
+        $user = User::factory()->create(['email_verified_at' => null]);
+
+        $this->postJson(route('login'), [
+            'email' => $user->email,
+            'password' => 'password',
+            'role' => RoleEnum::PATIENT,
+        ])->assertForbidden()->assertJsonStructure([
+            'message', 'status',
+        ]);
+    }
+
+    public function test_patient_can_login_successfully()
+    {
+        $user = User::factory()->create(['email_verified_at' => now()]);
+
+        $this->postJson(route('login'), [
+            'email' => $user->email,
+            'password' => 'password',
+            'role' => RoleEnum::PATIENT,
+        ])->assertOk()->assertJsonStructure([
+            'message', 'data' => [
+                'token', 'user' => [
+                    'id', 'first_name', 'last_name', 'email', 'phone', 'profile_picture', 'created_at', 'updated_at',
+                ],
+            ],
+        ]);
     }
 }
