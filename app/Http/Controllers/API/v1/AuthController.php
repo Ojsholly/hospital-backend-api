@@ -61,7 +61,7 @@ class AuthController extends Controller
         }
 
         $data = match ($request->role) {
-            RoleEnum::PATIENT => [
+            RoleEnum::PATIENT, RoleEnum::ADMIN, RoleEnum::SUPER_ADMIN => [
                 'user' => new UserResource($user),
             ],
         };
