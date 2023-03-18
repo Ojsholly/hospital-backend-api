@@ -17,11 +17,16 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('email')->unique();
             $table->string('phone')->unique();
+            $table->date('date_of_birth');
+            $table->string('gender', 1);
             $table->text('profile_picture')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index(['first_name', 'last_name', 'email', 'phone']);
         });
     }
 

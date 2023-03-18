@@ -45,4 +45,9 @@ trait HasRoles
     {
         return ! $this->hasRole($role);
     }
+
+    public function removeRole(string $role): void
+    {
+        $this->roles()->detach(Role::where('name', $role)->first());
+    }
 }
