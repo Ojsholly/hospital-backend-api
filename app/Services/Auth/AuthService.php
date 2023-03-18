@@ -5,6 +5,7 @@ namespace App\Services\Auth;
 use App\Interfaces\AuthInterface;
 use App\Models\User;
 use Exception;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -37,6 +38,8 @@ class AuthService implements AuthInterface
         );
 
         $user->markEmailAsVerified();
+
+        event(new Verified($user));
     }
 
     public function findUserByEmail(string $email): ?User
