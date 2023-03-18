@@ -50,6 +50,8 @@ class AuthenticationTest extends TestCase
             'last_name' => $this->faker->lastName(),
             'email' => $this->faker->email(),
             'phone' => '0802'.mt_rand(1000000, 9999999),
+            'gender' => ['M', 'F'][mt_rand(0, 1)],
+            'date_of_birth' => $this->faker->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
             'password' => $password,
             'password_confirmation' => $password,
             'profile_picture' => UploadedFile::fake()->image('profile_picture.jpg', 100, 100),

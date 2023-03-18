@@ -29,6 +29,8 @@ class RegistrationRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:255', 'unique:users'],
+            'date_of_birth' => ['required', 'date', 'before:today'],
+            'gender' => ['required', 'string', 'in:M,F'],
             'password' => ['required', 'confirmed', Password::default()],
             'profile_picture' => ['required', 'image', 'max:2048'],
         ];
