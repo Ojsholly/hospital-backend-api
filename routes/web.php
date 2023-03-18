@@ -19,3 +19,7 @@ Route::get('/', function () {
 });
 
 Route::get('email/verify/{id}', [AuthController::class, 'verify'])->name('verification.verify');
+
+Route::view('reset-password', 'auth.reset-password')->name('password.reset');
+
+Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('password.update');

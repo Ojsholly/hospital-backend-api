@@ -22,10 +22,6 @@ class AuthController extends Controller
     {
     }
 
-    /**
-     * @param string $user_id
-     * @return Application|Factory|View
-     */
     public function verify(string $user_id): Application|Factory|View
     {
         if (! request()->hasValidSignature()) {
@@ -44,7 +40,6 @@ class AuthController extends Controller
     }
 
     /**
-     * @param LoginRequest $request
      * @return JsonResponse
      */
     public function login(LoginRequest $request)
@@ -84,7 +79,6 @@ class AuthController extends Controller
     }
 
     /**
-     * @param ResetPasswordRequest $request
      * @return Application|Factory|View|\Illuminate\Foundation\Application
      */
     public function resetPassword(ResetPasswordRequest $request)
