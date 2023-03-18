@@ -8,7 +8,9 @@ use Database\Seeders\DoctorSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -95,5 +97,53 @@ class AuthenticationTest extends TestCase
                 ],
             ],
         ]);
+    }
+
+    public function test_doctor_wallet_is_created_after_doctor_verifies_email_successfully()
+    {
+        $doctor = Doctor::factory()->create();
+
+        $doctor->user->forceFill([
+            'email_verified_at' => null,
+        ])->save();
+
+        Mail::fake();
+
+        $this->postJson(route('login'), [
+            'email' => $doctor->user->email,
+            'password' => 'password',
+            'role' => RoleEnum::DOCTOR,
+        ])->assertForbidden()->assertJsonStructure([
+            'status', 'message',
+        ]);
+
+        $this->assertDatabaseMissing('wallets', [
+            'doctor_id' => $doctor->id,
+        ]);
+
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $doctor->user_id, 'hash' => sha1($doctor->user->getEmailForVerification())]
+        );
+
+        Auth::login($doctor->user);
+        $doctor->user->sendEmailVerificationNotification();
+
+        // Visit the verification URL and assert that the user's email is verified
+        $this->get($verificationUrl)
+            ->assertOk()
+            ->assertViewIs('auth.verify-email')
+            ->assertViewHas('status', 'success')
+            ->assertViewHas('message', 'Email address verified successfully. You can now close this window.');
+
+        $this->assertDatabaseHas('wallets', [
+            'doctor_id' => $doctor->id,
+            'available_balance' => 0,
+            'ledger_balance' => 0,
+            'is_locked' => false,
+        ]);
+
+        $this->assertTrue($doctor->user->fresh()->hasVerifiedEmail());
     }
 }
