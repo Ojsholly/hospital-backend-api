@@ -21,6 +21,7 @@ class DoctorFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->removeRole(RoleEnum::PATIENT);
         $user->assignRole(RoleEnum::DOCTOR);
 
         return [

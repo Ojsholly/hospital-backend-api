@@ -21,6 +21,8 @@ class DoctorResource extends JsonResource
             'last_name' => $this->user->last_name,
             'email' => $this->user->email,
             'phone' => $this->user->phone,
+            'gender' => $this->user->gender === 'M' ? 'Male' : 'Female',
+            'date_of_birth' => $this->user->date_of_birth->toFormattedDateString(),   // Sunday, 1st January 2023.
             'profile_picture' => $this->user->profile_picture,
             'specialty' => Str::ucfirst($this->specialty),
             'medical_license_number' => $this->medical_license_number,
