@@ -5,12 +5,14 @@ namespace App\Http\Controllers\API\v1;
 use App\Enums\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Resources\Doctor\DoctorResource;
 use App\Http\Resources\User\UserResource;
 use App\Services\Auth\AuthService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Throwable;
 
@@ -20,6 +22,10 @@ class AuthController extends Controller
     {
     }
 
+    /**
+     * @param string $user_id
+     * @return Application|Factory|View
+     */
     public function verify(string $user_id): Application|Factory|View
     {
         if (! request()->hasValidSignature()) {
@@ -37,6 +43,10 @@ class AuthController extends Controller
         return view('auth.verify-email', ['status' => 'success', 'message' => 'Email address verified successfully. You can now close this window.']);
     }
 
+    /**
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
     public function login(LoginRequest $request)
     {
         try {
@@ -71,5 +81,32 @@ class AuthController extends Controller
         };
 
         return response()->success(compact('token') + $data, 'Login successful.');
+    }
+
+    /**
+     * @param ResetPasswordRequest $request
+     * @return Application|Factory|View|\Illuminate\Foundation\Application
+     */
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        try {
+            $user = $this->authService->findUserByEmail($request->email);
+
+            if (! $user) {
+                return view('auth.reset-password', ['status' => 'error', 'message' => "We couldn't find a user with the provided email address."]);
+            }
+
+            if (! $user->hasVerifiedEmail()) {
+                $this->authService->verifyEmail($user->id);
+            }
+
+            $this->authService->resetPassword($request->email, $request->token, $request->password);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return view('auth.reset-password', ['status' => 'error', 'message' => $exception->getMessage()]);
+        }
+
+        return view('auth.reset-password', ['status' => 'success', 'message' => 'Password reset successfully. You can now close this window.']);
     }
 }
