@@ -31,6 +31,13 @@ class DoctorResource extends JsonResource
             'biography' => $this->biography,
             'address' => $this->address,
             'consultation_fee' => number_format($this->consultation_fee, 2),
+            'wallet' => $this->whenLoaded('wallet', function ($wallet) {
+                return [
+                    'available_balance' => $wallet->available_balance,
+                    'ledger_balance' => $wallet->ledger_balance,
+                    'is_locked' => (bool) $wallet->is_locked,
+                ];
+            }),
             'created_at' => $this->created_at->toDayDateTimeString(),
             'updated_at' => $this->updated_at->diffForHumans(),
             'deleted_at' => $this->deleted_at?->toDayDateTimeString(),
