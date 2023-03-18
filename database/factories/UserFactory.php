@@ -24,6 +24,8 @@ class UserFactory extends Factory
             'last_name' => fake()->lastName,
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->unique()->phoneNumber(),
+            'gender' => ['M', 'F'][mt_rand(0, 1)],
+            'date_of_birth' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
             'profile_picture' => fake()->imageUrl(),
             'email_verified_at' => now(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
