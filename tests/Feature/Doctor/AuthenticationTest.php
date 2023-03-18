@@ -146,4 +146,24 @@ class AuthenticationTest extends TestCase
 
         $this->assertTrue($doctor->user->fresh()->hasVerifiedEmail());
     }
+
+    public function test_doctors_can_reset_their_passwords_successfully()
+    {
+        $doctor = Doctor::factory()->create();
+
+        $token = $this->app->make('auth.password.broker')->createToken($doctor->user);
+
+        $this->postJson(route('password.update'), [
+            'token' => $token,
+            'email' => $doctor->user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ])
+        ->assertOk()
+        ->assertViewIs('auth.reset-password')
+        ->assertViewHas('status', 'success')
+        ->assertViewHas('message', 'Password reset successfully. You can now close this window.');
+
+        $this->assertTrue($doctor->user->fresh()->hasVerifiedEmail());
+    }
 }
