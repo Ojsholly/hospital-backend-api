@@ -24,7 +24,7 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'date_of_birth' => $this->date_of_birth->toFormattedDateString(),   // Sunday, 1st January 2023.
             'age' => $this->age,
-            'gender' => Str::ucfirst($this->gender),
+            'gender' => $this->gender === 'M' ? 'Male' : 'Female',
             'profile_picture' => $this->profile_picture,
             'roles' => new RoleResourceCollection($this->whenLoaded('roles')),
             'created_at' => $this->created_at->toDayDateTimeString(),

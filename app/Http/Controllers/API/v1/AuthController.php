@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\v1;
 use App\Enums\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\Doctor\DoctorResource;
 use App\Http\Resources\User\UserResource;
 use App\Services\Auth\AuthService;
 use Illuminate\Contracts\Foundation\Application;
@@ -63,6 +64,9 @@ class AuthController extends Controller
         $data = match ($request->role) {
             RoleEnum::PATIENT, RoleEnum::ADMIN, RoleEnum::SUPER_ADMIN => [
                 'user' => new UserResource($user),
+            ],
+            RoleEnum::DOCTOR => [
+                'doctor' => new DoctorResource($user->doctor),
             ],
         };
 
