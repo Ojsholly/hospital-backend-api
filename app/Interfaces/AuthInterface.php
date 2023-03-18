@@ -11,4 +11,6 @@ interface AuthInterface
     public function verifyEmail(string $id): void;
 
     public function findUserByEmail(string $email): ?User;
+
+    public function resetPassword(string $email, string $token, string $password): void;
 }
