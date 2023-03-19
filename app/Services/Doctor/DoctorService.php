@@ -6,6 +6,7 @@ use App\Enums\RoleEnum;
 use App\Interfaces\DoctorInterface;
 use App\Models\Doctor;
 use App\Services\Auth\AuthService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -27,5 +28,20 @@ class DoctorService implements DoctorInterface
 
             return $user->doctor;
         });
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function getDoctorById(string $id): Doctor
+    {
+        $doctor = Doctor::find($id);
+
+        throw_if(
+            ! $doctor,
+            new ModelNotFoundException('Requested doctor account not found.')
+        );
+
+        return $doctor;
     }
 }
