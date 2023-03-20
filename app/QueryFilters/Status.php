@@ -12,7 +12,7 @@ class Status extends Filter
         $status = request()->query('status');                   // Get the status from the query string. This value is expected to be separated by a comma in case of multiple values.
 
         return $builder->when($status, function ($query) use ($status) {     // Check if the status is present in the query string.
-            $query->whereIn('status', explode(',', $status));   // If present, filter the query by the status.
+        $query->whereIn('status', explode(',', $status));   // If present, filter the query by the status.
         });
     }
 }
