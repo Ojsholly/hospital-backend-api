@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\QueryFilters\DateRange;
+use App\QueryFilters\Sort;
+use App\QueryFilters\Status;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Pipeline\Pipeline;
 
 class Appointment extends Model
 {
@@ -21,7 +25,7 @@ class Appointment extends Model
     ];
 
     protected $with = [
-        'user', 'doctor',
+        'user',
     ];
 
     public function user(): BelongsTo
@@ -42,5 +46,16 @@ class Appointment extends Model
     public function hasBeenPaidFor(): bool
     {
         return $this->transaction?->count() > 0 && $this->transaction->status === 'success';
+    }
+
+    public static function allAppointments()
+    {
+        return app(Pipeline::class)
+                ->send(Appointment::query())
+                ->through([
+                    Status::class,
+                    Sort::class,
+                    DateRange::class,
+                ])->thenReturn();
     }
 }

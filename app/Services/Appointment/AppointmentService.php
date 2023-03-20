@@ -5,6 +5,7 @@ namespace App\Services\Appointment;
 use App\Interfaces\AppointmentInterface;
 use App\Models\Appointment;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Throwable;
 
 class AppointmentService implements AppointmentInterface
@@ -38,5 +39,13 @@ class AppointmentService implements AppointmentInterface
         $appointment->update($data);
 
         return $appointment;
+    }
+
+    public function getAllAppointments(array $params = [], array $relations = [], array $pagination = []): LengthAwarePaginator
+    {
+        return Appointment::allAppointments()
+            ->with($relations)
+            ->where($params)
+            ->paginate(data_get($pagination, 'per_page', 10));
     }
 }
