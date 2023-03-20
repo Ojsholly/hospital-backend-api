@@ -45,17 +45,18 @@ The API documentation can be found at the following url: https://documenter.getp
     php artisan queue:listen
 ```
 
-### Usage
+### Deployment
+The project can be hosted on any VPS via the following steps:
+1. Install PHP and Composer on the VPS.
+2. Clone the repository.
+3. Install dependencies.
+4. Create the project environment file.
+5. Generate a new application key.
+6. Add mailing, storage (cloudinary) database, and payment credentials.
+7. Seed the Database.
+8. Start queue listener.
+9. Configure the web server to serve the project.
 
-```
-    The admin login credentials can be found in the .env.example file. The credentials are 
-    'email' => 'olusolaojewunmi@gmail.com'
-    'password' => '12345678'
-    
-    A user account can be retrived from the database and the same password used for attempting user login.
-
-    
-```
 
 ### Testing
 The project includes a PHPUnit test suite. To run the tests, execute the following command:
