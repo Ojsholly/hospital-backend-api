@@ -3,6 +3,7 @@
 namespace App\Services\Transaction;
 
 use App\Interfaces\TransactionInterface;
+use App\Models\Transaction;
 use App\Services\PaymentGateway\FlutterwaveService;
 use App\Services\PaymentGateway\PaystackService;
 use App\Traits\ReferenceTrait;
@@ -40,6 +41,7 @@ class TransactionService implements TransactionInterface
             'currency' => 'NGN',
             'metadata' => [
                 'appointment_id' => $data['id'],
+                'reference' => $data['reference'],
             ],
             'reference' => $this->transactionReference(),
             'callback_url' => route('appointments.verify-payment', [
@@ -95,6 +97,7 @@ class TransactionService implements TransactionInterface
     {
         return match ($paymentGateway) {
             'paystack' => $this->verifyPaystackTransaction($reference),
+            'flutterwave' => $this->verifyFlutterwaveTransaction($reference),
             default => throw new Exception('Invalid payment gateway'),
         };
     }
@@ -106,13 +109,44 @@ class TransactionService implements TransactionInterface
     {
         $response = $this->paystackService->verifyTransaction($reference);
 
+        throw_if(
+            data_get($response, 'data.status') != 'success',
+            new Exception('Payment failed')
+        );
+
         return [
-            'status' => data_get($response, 'data.status'),
+            'status' => data_get($response, 'data.status') === 'success' ? 'success' : 'failed',
             'reference' => data_get($response, 'data.reference'),
-            'amount' => data_get($response, 'data.amount'),
-            'currency' => data_get($response, 'data.currency'),
-            'transaction_date' => data_get($response, 'data.transaction_date'),
-            'gateway_response' => $response,
+            'amount' => data_get($response, 'data.amount') / 100,
+            'gateway' => 'paystack',
+            'appointment_id' => data_get($response, 'data.metadata.appointment_id'),
+            'description' => data_get($response, 'data.meta.narration') ?? 'Payment for appointment '.data_get($response, 'data.metadata.reference'),
+            'type' => 'debit',
         ];
+    }
+
+    public function verifyFlutterwaveTransaction(string $id): array
+    {
+        $response = $this->flutterwaveService->verifyTransaction($id);
+
+        throw_if(
+            data_get($response, 'data.status') === 'failed' || data_get($response, 'data.status') === 'cancelled',
+            new Exception('Payment failed')
+        );
+
+        return [
+            'status' => data_get($response, 'data.status') === 'successful' ? 'success' : 'failed',
+            'reference' => data_get($response, 'data.id'),
+            'amount' => data_get($response, 'data.amount'),
+            'gateway' => 'flutterwave',
+            'appointment_id' => data_get($response, 'data.meta.appointment_id'),
+            'description' => data_get($response, 'data.meta.narration') ?? 'Payment for appointment '.data_get($response, 'data.meta.reference'),
+            'type' => 'debit',
+        ];
+    }
+
+    public function createTransaction(array $data): Transaction
+    {
+        return Transaction::create($data);
     }
 }

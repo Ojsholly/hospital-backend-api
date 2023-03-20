@@ -11,4 +11,6 @@ interface FlutterwaveInterface
     public function client(): PendingRequest;
 
     public function initializeTransaction(array $data): object;
+
+    public function verifyTransaction(string $id): object;
 }
