@@ -63,3 +63,14 @@ The project includes a PHPUnit test suite. To run the tests, execute the followi
 ```
  php artisan test
 ```
+
+### Improvements
+- Add a feature to allow users to view their appointment and transaction history.
+- Add a feature to allow users to view their profile.
+- Add a feature to allow the admins to see all users and doctors.
+- Add a feature to allow the admins to view all appointments and transactions.
+- Add a feature to allow the admins to view all appointments and transactions for a particular user.
+- Add a feature to allow the admins to view all appointments and transactions for a particular doctor.
+- Add a feature to allow the admins to view all appointments and transactions for a particular date.
+- Add a feature to allow the doctors withdraw their earnings to their bank accounts.
+
