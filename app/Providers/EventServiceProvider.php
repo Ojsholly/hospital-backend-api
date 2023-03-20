@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\Appointment\PaymentConfirmedEvent;
+use App\Listeners\Appointment\ConfirmAppointmentBookingListener;
+use App\Listeners\Appointment\CreateAppointmentTransactionListener;
 use App\Listeners\Doctor\CreateWalletListener;
+use App\Listeners\SendAppointmentConfirmationMailListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -22,6 +26,11 @@ class EventServiceProvider extends ServiceProvider
         ],
         Verified::class => [
             CreateWalletListener::class,
+        ],
+        PaymentConfirmedEvent::class => [
+            ConfirmAppointmentBookingListener::class,
+            CreateAppointmentTransactionListener::class,
+            SendAppointmentConfirmationMailListener::class,
         ],
     ];
 

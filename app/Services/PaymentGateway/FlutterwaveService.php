@@ -35,4 +35,9 @@ class FlutterwaveService implements FlutterwaveInterface
 
         return $this->client()->post($this->getBaseUrl().'payments', $data)->throw()->object();
     }
+
+    public function verifyTransaction(string $reference): object
+    {
+        return $this->client()->get($this->getBaseUrl().'transactions/'.$reference.'/verify')->throw()->object();
+    }
 }
