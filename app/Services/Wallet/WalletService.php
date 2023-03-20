@@ -13,4 +13,19 @@ class WalletService implements WalletInterface
             'doctor_id' => $doctorId,
         ]);
     }
+
+    public function getDoctorWallet(string $doctorId): Wallet
+    {
+        return Wallet::where('doctor_id', $doctorId)->first();
+    }
+
+    public function creditDoctorWallet(string $doctorId, float $amount): Wallet
+    {
+        $wallet = $this->getDoctorWallet($doctorId);
+
+        $wallet->increment('available_balance', $amount);
+        $wallet->increment('ledger_balance', $amount);
+
+        return $wallet;
+    }
 }
